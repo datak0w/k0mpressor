@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kompressor</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <header class="hero">
+        <p class="kicker">Neon Turbo Batch Image Pipeline</p>
+        <h1 class="brand-title">
+          <span class="brand-icon" aria-hidden="true">🛠️</span>
+          <span>K0mpressor</span>
+        </h1>
+        <p>One image app to rule them all...</p>
+      </header>
+
+      <section class="panel">
+        <div id="dropzone" class="dropzone" role="button" tabindex="0" aria-label="Upload images">
+          <p class="drop-title">Drag & drop images here</p>
+          <p class="muted">or</p>
+          <label class="button secondary" for="fileInput">Choose files</label>
+          <input id="fileInput" type="file" accept="image/*" multiple />
+        </div>
+
+        <div class="options">
+          <h2>Output Options</h2>
+          <label class="option-row">
+            <input type="checkbox" id="keepRatio" checked />
+            <span>Keep aspect ratio (no stretching)</span>
+          </label>
+          <label class="option-row">
+            <input type="checkbox" id="optimize" checked />
+            <span>Optimize output size</span>
+          </label>
+          <label class="option-row">
+            <span>Output format</span>
+            <select id="outputFormat">
+              <option value="image/jpeg" selected>JPEG</option>
+              <option value="image/webp">WEBP</option>
+              <option value="image/png">PNG</option>
+            </select>
+          </label>
+          <label class="option-row">
+            <span>Output size</span>
+            <select id="outputSize">
+              <option value="1080x1080" selected>1080 x 1080 (Default)</option>
+              <option value="1920x1080">1920 x 1080 (Full HD)</option>
+              <option value="1366x768">1366 x 768 (Laptop)</option>
+              <option value="1280x720">1280 x 720 (HD)</option>
+              <option value="1200x630">1200 x 630 (Open Graph)</option>
+              <option value="1080x1350">1080 x 1350 (Instagram Portrait)</option>
+              <option value="1080x1920">1080 x 1920 (Stories/Reels)</option>
+              <option value="800x800">800 x 800</option>
+              <option value="512x512">512 x 512</option>
+              <option value="256x256">256 x 256</option>
+            </select>
+          </label>
+          <label class="option-row social-toggle-row">
+            <input type="checkbox" id="useSocialFormats" />
+            <span>Enable Social Bundle Export (ZIP folders by social format)</span>
+          </label>
+          <label class="option-row" id="qualityRow">
+            <span>Quality: <strong id="qualityValue">82%</strong></span>
+            <input id="quality" type="range" min="50" max="95" step="1" value="82" />
+          </label>
+          <label class="option-row">
+            <span>Background (for letterboxing)</span>
+            <input id="backgroundColor" type="color" value="#ffffff" />
+          </label>
+        </div>
+
+        <div id="socialOptions" class="social-options hidden">
+          <h2>Social Presets</h2>
+          <p class="muted">Select formats and export all at once (folders inside ZIP).</p>
+          <label class="option-row social-toggle-row">
+            <input type="checkbox" id="socialSelectAll" checked />
+            <span>Select all social formats</span>
+          </label>
+          <div id="socialPresetList" class="social-preset-list">
+            <label class="social-preset-item">
+              <input type="checkbox" data-social-preset value="instagram-post-square|Instagram_Post_Square|1080x1080" checked />
+              <span>Instagram Post Square — 1080x1080</span>
+            </label>
+            <label class="social-preset-item">
+              <input type="checkbox" data-social-preset value="instagram-portrait|Instagram_Portrait|1080x1350" checked />
+              <span>Instagram Portrait — 1080x1350</span>
+            </label>
+            <label class="social-preset-item">
+              <input type="checkbox" data-social-preset value="instagram-story|Instagram_Story|1080x1920" checked />
+              <span>Instagram Story/Reel — 1080x1920</span>
+            </label>
+            <label class="social-preset-item">
+              <input type="checkbox" data-social-preset value="facebook-post|Facebook_Post|1200x630" checked />
+              <span>Facebook Post Link — 1200x630</span>
+            </label>
+            <label class="social-preset-item">
+              <input type="checkbox" data-social-preset value="x-post|X_Post|1600x900" checked />
+              <span>X/Twitter Post — 1600x900</span>
+            </label>
+            <label class="social-preset-item">
+              <input type="checkbox" data-social-preset value="linkedin-post|LinkedIn_Post|1200x627" checked />
+              <span>LinkedIn Post — 1200x627</span>
+            </label>
+            <label class="social-preset-item">
+              <input type="checkbox" data-social-preset value="youtube-thumb|YouTube_Thumbnail|1280x720" checked />
+              <span>YouTube Thumbnail — 1280x720</span>
+            </label>
+            <label class="social-preset-item">
+              <input type="checkbox" data-social-preset value="tiktok-cover|TikTok_Cover|1080x1920" checked />
+              <span>TikTok Cover — 1080x1920</span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel stats">
+        <div><strong>Files:</strong> <span id="fileCount">0</span></div>
+        <div><strong>Total size:</strong> <span id="totalSize">0 MB</span></div>
+      </section>
+
+      <section class="panel actions">
+        <button id="clearBtn" class="button secondary" disabled>Clear queue</button>
+        <button id="downloadBtn" class="button" disabled>Convert and download ZIP</button>
+      </section>
+
+      <section class="panel">
+        <div class="progress-wrap">
+          <progress id="progressBar" max="100" value="0"></progress>
+          <span id="status">Ready.</span>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Upload Preview</h2>
+        <div id="previewGrid" class="preview-grid"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Queue Details</h2>
+        <ul id="fileList" class="file-list"></ul>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>Made with ❤️ by</span>
+      <img
+        class="footer-gif"
+        src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExczF3amtzODJ3NzE1cDZ4bmdvNGI5anBsa2Vrd2lzYnZ0OTQya3M2OSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/Dg4TxjYikCpiGd7tYs/giphy.gif"
+        alt="Made with love by Pedro"
+      />
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+    <script src="./app.js" type="module"></script>
+  </body>
+  </html>
